@@ -6,6 +6,7 @@
 
 ```
 <Pagination
+    ref="pagination"
     :params="searchParams"
     :requestFunc="requestFunc"
     @returnData="returnData"
@@ -18,4 +19,12 @@
 - 改变参数可以调用组件内Refresh()方法刷新数据，如
 ```
 <el-button type="success"  @click="$refs.pagination.Refresh()">查询</el-button>
+```
+- filterParams 过滤函数，用于调整请求的参数，如
+```
+filterParams(Params){
+    let p = cloneDeep(Params);
+    p.operateTagIdList = p.operateTagIdList.map(r=>{return r.id})
+    return p
+}
 ```

@@ -1,13 +1,13 @@
 <template>
     <div class="pagination">
         <el-pagination
-                @size-change="handleSizeChange"
-                @current-change="handleCurrentChange"
-                :current-page="pageParams.page"
-                :page-sizes="pageSizes"
-                :page-size="pageParams.pageSize"
-                layout="total, sizes, prev, pager, next, jumper"
-                :total="total">
+            @size-change="handleSizeChange"
+            @current-change="handleCurrentChange"
+            :current-page="pageParams.pageNum"
+            :page-sizes="pageSizes"
+            :page-size="pageParams.pageSize"
+            layout="total, sizes, prev, pager, next, jumper"
+            :total="total">
         </el-pagination>
     </div>
 </template>
@@ -16,21 +16,27 @@
     //如果需要保存分页信息和搜索数据可以在组件销毁之前用页面关键key保存在本地
     //也可以使用 keep-alive保存页面
     import G from 'lodash/get'
-
-    const pageSizesArr = [8, 16, 32];
+    import Config from '@/config/app.js'
+    // const pageSizesArr = [8, 16, 32];
     export default {
         name: "Pagination",
         props: {
             requestFunc: Function,
+            filterParams:{
+                type:Function,
+                default:p=>{
+                    return p
+                },
+            },
             params: Object,
         },
         data: () => {
             return {
                 total: 0,
-                pageSizes: pageSizesArr,
+                pageSizes: Config.pageSizesArr,
                 pageParams: {
-                    pageSize: pageSizesArr[0],
-                    page: 1
+                    pageSize: Config.pageSizesArr[0],
+                    pageNum: 1
                 }
             }
         },
@@ -41,19 +47,19 @@
                 //console.log(`每页 ${val} 条`);
             },
             handleCurrentChange(val) {
-                this.pageParams.page = val;
+                this.pageParams.pageNum = val;
                 this.getPageData();
                 //console.log(`当前页: ${val}`);
             },
             getPageData() {
-
-                this.requestFunc({...this.params, ...this.pageParams}).then(r => {
-                    this.total = G(r, 'total', 0);
+                let p = this.filterParams({...this.params, ...this.pageParams});
+                this.requestFunc(p).then(r => {
+                    this.total = parseInt(G(r, 'total', 0));
                     this.$emit('returnData', r);//this.$emit('returnData', G(r,'list',[]));
-                }).catch(_ => {
-                })
+                }).catch(_ => {})
             },
             Refresh() {
+                this.pageParams.pageNum = 1;
                 this.getPageData();
             },
         },
