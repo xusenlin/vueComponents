@@ -59,9 +59,12 @@
                 }).catch(_ => {})
             },
             Refresh() {
-                this.pageParams.pageNum = 1;
                 this.getPageData();
             },
+            Reset(){
+                this.pageParams.pageNum = 1;
+                this.getPageData();
+            }
         },
         mounted: function () {
             this.getPageData();
